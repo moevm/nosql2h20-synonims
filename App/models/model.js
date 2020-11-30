@@ -54,20 +54,44 @@ var createRelation = function (session, word1, word2, type) {
                 text2: word2
         })
       })
-       
       writeTxResultPromise
-        .then(session.close(),
-        console.log("!!!")
-        )
+        .then()
         .catch(error => {
           console.log(error)
         })
+        .then(() => session.close())
 
 }
 
 
+var findNode = function (session, word) {
+  let query = 'match (n:Word) where id = $id  return n.text'
+
+  var readTxResultPromise = session.readTransaction(txc => {
+   
+    var result = txc.run(query, 
+      {id: uuidv5(word, MY_NAMESPACE)
+      })
+
+    return result
+  })
+   
+  // returned Promise can be later consumed like this:
+  readTxResultPromise
+    .then(result => {
+      console.log(result.records); 
+      return result;
+    })
+    .catch(error => {
+      console.log(error)
+    })
+    .then(() => session.close())
+
+}
+
 
 module.exports = {
     create: create,
+    findNode: findNode,
     createRelation: createRelation
 }
