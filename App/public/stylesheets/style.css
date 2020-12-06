@@ -1,0 +1,21 @@
+.foundLabel{
+    font-size: 150%;
+}
+
+.foundInput{
+    font-size: 200%;
+    color: #17a2b8;
+    font-style: oblique;
+}
+
+.foundInput:active, .foundInput:focus, .foundInput:hover{
+    border: 0;
+} 
+
+.zero-padding{
+    padding: 0;
+}
+
+.zero-border{
+    border: 0;
+}
