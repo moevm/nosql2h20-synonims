@@ -30,6 +30,7 @@ router.get('/',  function(req, res, next) {
 router.post('/', function(req, res, next) {
   if (!req.body) return res.sendStatus(400)
 
+  const relArr = ["Synonyms", "Antonyms", "Wordforms"];
   
   if (req.headers.action == "search"){
 
@@ -43,11 +44,9 @@ router.post('/', function(req, res, next) {
         let Wordforms = model.findRelation(dbUtils.getSession(),req.body.text, "Wordform");
 
         Promise.all([Synonyms, Antonyms , Wordforms]).then(values => { 
-          //console.log(values);
+          console.log(values);
 
           var relations = {};
-
-          const relArr = ["Synonyms", "Antonyms", "Wordforms"];
 
           values.forEach((element,i) => {
             let relationList = [];
@@ -88,6 +87,17 @@ router.post('/', function(req, res, next) {
     model.deleteNode(dbUtils.getSession(),req.body.text)
      .then((result) => {
       res.sendStatus(200);
+    })
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(404)
+    });
+  }
+
+  else if (req.headers.action == "addRelation"){
+    model.createRelation(dbUtils.getSession(),req.body.text1,req.body.text2,req.body.type)
+    .then((result) => {
+     res.sendStatus(200);
     })
     .catch(error => {
       console.log(error);

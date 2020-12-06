@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let formGroup = document.createElement("div");
         formGroup.className = "form-group";
         let label = document.createElement("label");
-        label.for = "notFoundWord text-info";
-        label.className = "notFoundLabel"
+        label.for = "foundWord text-info";
+        label.className = "foundLabel"
         let input = document.createElement("input");
-        input.className = "form-control-plaintext notFoundInput"
+        input.className = "form-control-plaintext foundInput zero-border"
         input.value = word;
         input.name = "word"
-        input.id = "notFoundWord";
+        input.id = "foundWord";
         input.type = "text";
         input.readOnly = true;
         let button = document.createElement("button");
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         list.className = "list-group";
         list.classList.add(type)
 
-        arr.forEach(element => {
+        arr.forEach((element, i) => {
             item = document.createElement("li");
             item.className = "list-group-item"
             item.innerText = element;
@@ -77,11 +77,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         else if (type == "Wordforms"){
             label.innerText = "Словоформы";
-        }
+        }    
+
+        let list_item = document.createElement("li");
+        list_item.className = "list-group-item zero-padding";
+
+        let form = document.createElement("form")
+        form.id = type;
+        form.className = "form w-100"
+
+        let input_group = document.createElement("div");
+        input_group.className = "input-group"
+
+        let input = document.createElement("input");
+        input.type = "text";
+        input.name = "text";
+        input.className = "form-control zero-border";
+        input.placeholder = "Добавить новый"
+        input["aria-describedby"] = "button-addon";
+
+        let input_group_append = document.createElement("div");
+        input_group_append.className = "input-group-append";
+
+        let button_new = document.createElement("button");
+        button_new.className = "btn btn-outline-success zero-border";
+        button_new.type = "submit";
+        button_new.innerText = "+"
+        button_new.id = "button-addon";
 
 
+        input_group_append.appendChild(button_new);
+
+        input_group.appendChild(input);
+        input_group.appendChild(input_group_append);
+
+        form.appendChild(input_group);
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
     
+            if (form.text.value == ""){
+                return
+            }
 
+            //console.log(document.getElementById("foundWord").value)
+            var data = {text1 : document.getElementById("foundWord").value ,text2: form.text.value, type: form.id.slice(0, -1)};
+    
+            ajaxSend(data,"addRelation")
+                .then((response) => {
+
+                    item = document.createElement("li");
+                    item.className = "list-group-item"
+                    item.innerText = form.text.value;
+                    form.parentNode.parentNode.insertBefore(item,form.parentNode)
+                    form.reset();
+                })
+                .catch((err) => console.error(err))
+        });
+        
+
+        list_item.appendChild(form);
+
+        list.appendChild(list_item);
+        
         result.appendChild(label);
         result.appendChild(list)
 

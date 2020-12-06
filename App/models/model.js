@@ -43,26 +43,7 @@ var deleteNode = function (session, word) {
   return writeTxResultPromise;
 }
 
-var createRelation = function (session, word1, word2, type) {
 
-    let query = 'MERGE (a:Word{id: $id1, text: $text1})-[:Synonym]-(b:Word{id: $id2, text: $text2})';
-
-    var writeTxResultPromise = session.writeTransaction(async txc => {
-        await txc.run(query, {
-                id1: uuidv5(word1, MY_NAMESPACE),
-                text1: word1,
-                id2: uuidv5(word2, MY_NAMESPACE),
-                text2: word2
-        })
-      })
-      writeTxResultPromise
-        .then()
-        .catch(error => {
-          console.log(error)
-        })
-        .then(() => session.close())
-
-}
 
 
 var findNode = function (session, word) {
@@ -103,6 +84,29 @@ var findRelation = function (session,word, type) {
     .then(() => {session.close()})
 
     return readTxResultPromise;
+}
+
+
+var createRelation = function (session,word1,word2, type) {
+  let query = `match (n:Word) where n.id = $id1 merge (b:Word {id: $id2, text : $text2}) merge (n)-[:${type}]-(b)`
+
+  let writeTxResultPromise = session.writeTransaction(txc => {
+
+    var result = txc.run(query, 
+      {
+        id1: uuidv5(word1, MY_NAMESPACE),
+        id2: uuidv5(word2, MY_NAMESPACE),
+        text2: word2
+      })
+
+    return result
+  })
+
+
+  writeTxResultPromise
+    .then(() => {session.close()})
+
+    return writeTxResultPromise;
 }
 
 

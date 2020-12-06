@@ -1,8 +1,17 @@
-.notFoundLabel{
+.foundLabel{
     font-size: 150%;
-    color: #17a2b8;
 }
 
-.notFoundInput{
+.foundInput{
     font-size: 200%;
+    color: #17a2b8;
+    font-style: oblique;
+}
+
+.zero-padding{
+    padding: 0;
+}
+
+.zero-border{
+    border: 0;
 }
