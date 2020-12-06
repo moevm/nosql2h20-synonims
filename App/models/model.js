@@ -1,3 +1,4 @@
+const { Relationship } = require('neo4j-driver');
 const { v5: uuidv5 } = require('uuid');
 
 const MY_NAMESPACE = "d846158b-bf02-40d4-862e-a6fc44baeae3";
@@ -84,13 +85,14 @@ var findNode = function (session, word) {
 }
 
 
-var findRelation = function (session,word) {
-  let query = 'match (n:Word) where n.id = $id  return n.text'
+var findRelation = function (session,word, type) {
+  let query = `match (n:Word) where n.id = $id  match (n)-[:${type}]-(b) return b.text`
 
   let readTxResultPromise = session.readTransaction(txc => {
 
     var result = txc.run(query, 
-      {id: uuidv5(word, MY_NAMESPACE)
+      {
+        id: uuidv5(word, MY_NAMESPACE),
       })
 
     return result
@@ -98,7 +100,7 @@ var findRelation = function (session,word) {
 
 
   readTxResultPromise
-    .then(() => {session.close(); console.log("Session.close")})
+    .then(() => {session.close()})
 
     return readTxResultPromise;
 }
@@ -108,5 +110,6 @@ module.exports = {
     createNode: createNode,
     deleteNode: deleteNode,
     findNode: findNode,
+    findRelation: findRelation,
     createRelation: createRelation
 }

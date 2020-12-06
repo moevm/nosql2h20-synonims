@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const createForm = (option, word) =>{
         let resBlock = document.createElement("form");
-        resBlock.id = "searchRes"
         resBlock.className = "pt-5 form-inline";
         let formGroup = document.createElement("div");
         formGroup.className = "form-group";
@@ -53,9 +52,44 @@ document.addEventListener('DOMContentLoaded', () => {
         return resBlock;
     }
 
-    const wordFound = (word) =>{
-        let form = createForm(1, word);
 
+    const createList = (type, arr) => {
+        console.log(arr);
+        let result = document.createElement("div");
+        let label = document.createElement("h4")
+        label.innerText = "type";
+        let list = document.createElement("ul")
+        list.className = "list-group";
+        list.classList.add(type)
+
+        arr.forEach(element => {
+            item = document.createElement("li");
+            item.className = "list-group-item"
+            item.innerText = element;
+            list.appendChild(item);
+        });
+        
+        if (type == "Synonyms"){
+            label.innerText = "Синонимы";
+        }
+        else if (type == "Antonyms"){
+            label.innerText = "Антонимы";
+        }
+        else if (type == "Wordforms"){
+            label.innerText = "Словоформы";
+        }
+
+
+    
+
+        result.appendChild(label);
+        result.appendChild(list)
+
+        return result
+    }
+
+    const wordFound = (word, relationList) =>{
+        let form = createForm(1, word);
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -65,20 +99,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             var data = {text: form.word.value};
             
-    
             ajaxSend(data, "delete")
                 .then((response) => {
                     deleteSearchRes();
                     if(response.status == 200){
-
+                        wordNotFound(form.word.value);
                     }
-                    
                 })
                 .catch((err) => console.error(err))
         });
 
+        console.log(relationList);
+        //relationList = JSON.parse(relationList);
+        let searchRes = document.createElement("div");
+        searchRes.id = "searchRes"
+        searchRes.appendChild(form);
 
-        mainContent.appendChild(form);
+        const relArr = ["Synonyms", "Antonyms", "Wordforms"];
+
+        let words = document.createElement("div");
+        words.className = "row pt-5";
+        relArr.forEach(element => {
+            let col = document.createElement("div");
+            col.className = "col-sm";
+            col.appendChild(createList(element,relationList[element]));
+            words.appendChild(col);
+        });
+
+        searchRes.appendChild(words);
+
+
+        mainContent.appendChild(searchRes);
     }
 
 
@@ -99,13 +150,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then((response) => {
                     deleteSearchRes();
                     if(response.status == 200){
-
+                        wordFound(form.word.value);
                     }
                     
                 })
                 .catch((err) => console.error(err))
         });
 
+
+        form.id = "searchRes"
         mainContent.appendChild(form);
         
     }
@@ -144,9 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     wordNotFound(searchForm.text.value);
                 }
                 else {
-                    wordFound(searchForm.text.value);
+                    response.json().then((res)=>{
+                        wordFound(searchForm.text.value, res);
+                    })
                 }
-                searchForm.reset(); // очищаем поля формы 
+                //searchForm.reset(); // очищаем поля формы 
             })
             .catch((err) => console.error(err))
     });

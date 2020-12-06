@@ -32,10 +32,39 @@ router.post('/', function(req, res, next) {
 
   
   if (req.headers.action == "search"){
-    let answer = model.findNode(dbUtils.getSession(),req.body.text);
-    answer.then((result) => {
+
+
+    model.findNode(dbUtils.getSession(),req.body.text)
+    .then((result) => {
       if (result.records.length != 0){
-        res.sendStatus(200)
+
+        let Synonyms = model.findRelation(dbUtils.getSession(),req.body.text, "Synonym");
+        let Antonyms = model.findRelation(dbUtils.getSession(),req.body.text, "Antonym");
+        let Wordforms = model.findRelation(dbUtils.getSession(),req.body.text, "Wordform");
+
+        Promise.all([Synonyms, Antonyms , Wordforms]).then(values => { 
+          //console.log(values);
+
+          var relations = {};
+
+          const relArr = ["Synonyms", "Antonyms", "Wordforms"];
+
+          values.forEach((element,i) => {
+            let relationList = [];
+            element.records.forEach(elem => {
+              relationList.push(elem._fields[0]);
+            });
+            relations[relArr[i]] = relationList;
+          });
+
+          res.send(JSON.stringify(relations))
+
+        })
+        .catch(error => {
+          console.log(error);
+          res.sendStatus(404)
+        });
+
       }  
       else (res.sendStatus(204)) 
     })
@@ -46,8 +75,8 @@ router.post('/', function(req, res, next) {
 
   }
   else if (req.headers.action == "add"){
-    let answer = model.createNode(dbUtils.getSession(),req.body.text);
-    answer.then((result) => {
+    model.createNode(dbUtils.getSession(),req.body.text)
+     .then((result) => {
       res.sendStatus(200);
     })
     .catch(error => {
@@ -56,8 +85,8 @@ router.post('/', function(req, res, next) {
     });
   }
   else if (req.headers.action == "delete"){
-    let answer = model.deleteNode(dbUtils.getSession(),req.body.text);
-    answer.then((result) => {
+    model.deleteNode(dbUtils.getSession(),req.body.text)
+     .then((result) => {
       res.sendStatus(200);
     })
     .catch(error => {
