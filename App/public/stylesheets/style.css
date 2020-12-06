@@ -8,6 +8,10 @@
     font-style: oblique;
 }
 
+.foundInput:active, .foundInput:focus, .foundInput:hover{
+    border: 0;
+} 
+
 .zero-padding{
     padding: 0;
 }

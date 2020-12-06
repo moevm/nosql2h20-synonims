@@ -1,4 +1,3 @@
-const { Relationship } = require('neo4j-driver');
 const { v5: uuidv5 } = require('uuid');
 
 const MY_NAMESPACE = "d846158b-bf02-40d4-862e-a6fc44baeae3";
@@ -32,6 +31,26 @@ var deleteNode = function (session, word) {
     var result = txc.run(query, 
       {
         id: uuidv5(word, MY_NAMESPACE),
+    })
+    
+    return result
+  })
+
+  writeTxResultPromise
+    .then(() => {session.close()})
+
+  return writeTxResultPromise;
+}
+
+var deleteRelation = function (session, word1, word2, type) {
+  let query = `Match (n:Word) where n.id1 = $id match (b:Word) where b.id = $id2 match (n)-[k:${type}]-(b) delete n`
+
+  let writeTxResultPromise = session.writeTransaction(txc => {
+
+    var result = txc.run(query, 
+      {
+        id1: uuidv5(word, MY_NAMESPACE),
+        id1: uuidv5(word, MY_NAMESPACE)
     })
     
     return result
@@ -115,5 +134,6 @@ module.exports = {
     deleteNode: deleteNode,
     findNode: findNode,
     findRelation: findRelation,
-    createRelation: createRelation
+    createRelation: createRelation,
+    deleteRelation: deleteRelation
 }

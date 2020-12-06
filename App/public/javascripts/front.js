@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     const createList = (type, arr) => {
-        console.log(arr);
         let result = document.createElement("div");
         let label = document.createElement("h4")
         label.innerText = "type";
@@ -65,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         arr.forEach((element, i) => {
             item = document.createElement("li");
             item.className = "list-group-item"
+            //item_form = document.createElement("form")
             item.innerText = element;
             list.appendChild(item);
         });
@@ -167,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch((err) => console.error(err))
         });
 
-        console.log(relationList);
         //relationList = JSON.parse(relationList);
         let searchRes = document.createElement("div");
         searchRes.id = "searchRes"
@@ -207,9 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ajaxSend(data, "add")
                 .then((response) => {
                     deleteSearchRes();
-                    if(response.status == 200){
-                        wordFound(form.word.value);
-                    }
+                    wordFound(form.word.value, {Synonyms: [], Antonyms: [], Wordforms: []})
                     
                 })
                 .catch((err) => console.error(err))

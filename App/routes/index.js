@@ -44,7 +44,6 @@ router.post('/', function(req, res, next) {
         let Wordforms = model.findRelation(dbUtils.getSession(),req.body.text, "Wordform");
 
         Promise.all([Synonyms, Antonyms , Wordforms]).then(values => { 
-          console.log(values);
 
           var relations = {};
 
@@ -96,6 +95,17 @@ router.post('/', function(req, res, next) {
 
   else if (req.headers.action == "addRelation"){
     model.createRelation(dbUtils.getSession(),req.body.text1,req.body.text2,req.body.type)
+    .then((result) => {
+     res.sendStatus(200);
+    })
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(404)
+    });
+  }
+
+  else if (req.headers.action == "deleteRelation"){
+    model.deleteRelation(dbUtils.getSession(),req.body.text1,req.body.text2,req.body.type)
     .then((result) => {
      res.sendStatus(200);
     })
