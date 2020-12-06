@@ -15,6 +15,7 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+//app.use((req, res, next) => {console.log(req.body); next()})
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);

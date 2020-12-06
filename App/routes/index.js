@@ -1,19 +1,21 @@
 var express = require('express');
 var router = express.Router();
-var bodyParser = require('body-parser')
+//var bodyParser = require('body-parser')
 
 var model = require('../models/model')
 var dbUtils = require('../neo4j/dbUtils')
-var parser= require('../models/Parser/parser')
+var parser= require('../models/Parser/parser');
+const { search } = require('../app');
 
 
-router.use(bodyParser.urlencoded({ extended: false}));
-router.use(bodyParser.json());
+//router.use(bodyParser.urlencoded({ extended: false}));
+//router.use(bodyParser.json());
 
 
-const urlencodedParser = bodyParser.urlencoded({
-  extended: false,
-})
+//const urlencodedParser = bodyParser.urlencoded({
+//  extended: false,
+//})
+
 
 
 //parser.readData(dbUtils);
@@ -25,16 +27,45 @@ router.get('/',  function(req, res, next) {
 });
 
 
-router.post('/', urlencodedParser, function(req, res, next) {
+router.post('/', function(req, res, next) {
   if (!req.body) return res.sendStatus(400)
-  //console.log(req.headers);
-  console.log(req.body);
-  if (req.headers.action = "search"){
-    //console.log(req.body);
-    //let result = model.findNode(dbUtils.getSession(),req.body.text);
-    //console.log(result);
+
+  
+  if (req.headers.action == "search"){
+    let answer = model.findNode(dbUtils.getSession(),req.body.text);
+    answer.then((result) => {
+      if (result.records.length != 0){
+        res.sendStatus(200)
+      }  
+      else (res.sendStatus(204)) 
+    })
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(404)
+    });
+
   }
-  res.redirect('/');
+  else if (req.headers.action == "add"){
+    let answer = model.createNode(dbUtils.getSession(),req.body.text);
+    answer.then((result) => {
+      res.sendStatus(200);
+    })
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(404)
+    });
+  }
+  else if (req.headers.action == "delete"){
+    let answer = model.deleteNode(dbUtils.getSession(),req.body.text);
+    answer.then((result) => {
+      res.sendStatus(200);
+    })
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(404)
+    });
+  }
+  
 });
 
 

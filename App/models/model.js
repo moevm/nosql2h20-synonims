@@ -2,46 +2,46 @@ const { v5: uuidv5 } = require('uuid');
 
 const MY_NAMESPACE = "d846158b-bf02-40d4-862e-a6fc44baeae3";
 
-var create = function (session, word) {
-    let query = 'MERGE (a:Word {id: $id, text : $text})'
-    session
-        .run(query, {
-            id: uuidv5(word, MY_NAMESPACE),
-            text: word
-        })
-        .then()
-        .catch(error => {
-            console.log(error)
-        })
-        .then(() => session.close())
+var createNode = function (session, word) {
+    let query = 'MERGE (n:Word {id: $id, text : $text})'
 
+    let writeTxResultPromise = session.writeTransaction(txc => {
+
+      var result = txc.run(query, 
+        {
+          id: uuidv5(word, MY_NAMESPACE),
+          text: word
+      })
+      
+      return result
+    })
+  
+    writeTxResultPromise
+      .then(() => {session.close()})
+  
+    return writeTxResultPromise;
 }
 
-/*
-var createRelation = function (session, word1, word2, type) {
 
+var deleteNode = function (session, word) {
+  let query = 'Match (n:Word) where n.id = $id delete n'
 
-    let query = 'MERGE (a:Word{id: $id1, text: $text1})\
-    MERGE (b:Word{id: $id2, text: $text2})\
-    MERGE (a)-[:Synonym]-(b)';
+  let writeTxResultPromise = session.writeTransaction(txc => {
 
+    var result = txc.run(query, 
+      {
+        id: uuidv5(word, MY_NAMESPACE),
+    })
+    
+    return result
+  })
 
+  writeTxResultPromise
+    .then(() => {session.close()})
 
-    session
-        .run(query, {
-            id1: uuidv5(word1, MY_NAMESPACE),
-            text1: word1,
-            id2: uuidv5(word2, MY_NAMESPACE),
-            text2: word2,
-        })
-        .then()
-          .catch(error => {
-            console.log(error)
-          })
-          .then(() => session.close())
-
+  return writeTxResultPromise;
 }
-*/
+
 var createRelation = function (session, word1, word2, type) {
 
     let query = 'MERGE (a:Word{id: $id1, text: $text1})-[:Synonym]-(b:Word{id: $id2, text: $text2})';
@@ -65,33 +65,48 @@ var createRelation = function (session, word1, word2, type) {
 
 
 var findNode = function (session, word) {
-  let query = 'match (n:Word) where id = $id  return n.text'
+  let query = 'match (n:Word) where n.id = $id  return n.text'
 
-  var readTxResultPromise = session.readTransaction(txc => {
-   
+  let readTxResultPromise = session.readTransaction(txc => {
+
     var result = txc.run(query, 
       {id: uuidv5(word, MY_NAMESPACE)
       })
 
     return result
   })
-   
-  // returned Promise can be later consumed like this:
+
   readTxResultPromise
-    .then(result => {
-      console.log(result.records); 
-      return result;
-    })
-    .catch(error => {
-      console.log(error)
-    })
-    .then(() => session.close())
+    .then(() => {session.close();})
+
+    return readTxResultPromise;
 
 }
 
 
+var findRelation = function (session,word) {
+  let query = 'match (n:Word) where n.id = $id  return n.text'
+
+  let readTxResultPromise = session.readTransaction(txc => {
+
+    var result = txc.run(query, 
+      {id: uuidv5(word, MY_NAMESPACE)
+      })
+
+    return result
+  })
+
+
+  readTxResultPromise
+    .then(() => {session.close(); console.log("Session.close")})
+
+    return readTxResultPromise;
+}
+
+
 module.exports = {
-    create: create,
+    createNode: createNode,
+    deleteNode: deleteNode,
     findNode: findNode,
     createRelation: createRelation
 }

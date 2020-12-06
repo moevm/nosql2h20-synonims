@@ -1,30 +1,151 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const ajaxSend = async (formData) => {
+    var mainContent = document.getElementById("mainContent");
+
+
+    const deleteSearchRes = () =>{
+        let elem = document.getElementById("searchRes")
+        if (elem != null){
+            mainContent.removeChild(elem);
+        }
+    }
+
+
+    const createForm = (option, word) =>{
+        let resBlock = document.createElement("form");
+        resBlock.id = "searchRes"
+        resBlock.className = "pt-5 form-inline";
+        let formGroup = document.createElement("div");
+        formGroup.className = "form-group";
+        let label = document.createElement("label");
+        label.for = "notFoundWord text-info";
+        label.className = "notFoundLabel"
+        let input = document.createElement("input");
+        input.className = "form-control-plaintext notFoundInput"
+        input.value = word;
+        input.name = "word"
+        input.id = "notFoundWord";
+        input.type = "text";
+        input.readOnly = true;
+        let button = document.createElement("button");
+        button.className = "btn mb-3"
+        button.type = "submit";
+
+        if (option == 1){
+            label.innerHTML = "Найдено";
+            button.innerText = "Удалить";
+            button.classList.add("btn-danger");
+        }
+        else if(option == 2){
+            label.innerHTML = "Слово не найдено";
+            button.innerText = "Добавить слово";
+            button.classList.add("btn-success");
+        }
+
+
+        formGroup.appendChild(label);
+        formGroup.appendChild(input);
+
+
+        resBlock.appendChild(formGroup);
+        resBlock.appendChild(button);
+
+        return resBlock;
+    }
+
+    const wordFound = (word) =>{
+        let form = createForm(1, word);
+
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            if (form.word.value == ""){
+                return
+            }
+            var data = {text: form.word.value};
+            
+    
+            ajaxSend(data, "delete")
+                .then((response) => {
+                    deleteSearchRes();
+                    if(response.status == 200){
+
+                    }
+                    
+                })
+                .catch((err) => console.error(err))
+        });
+
+
+        mainContent.appendChild(form);
+    }
+
+
+    const wordNotFound = (word) =>{
+
+        let form = createForm(2, word);
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            if (form.word.value == ""){
+                return
+            }
+            var data = {text: form.word.value};
+            
+    
+            ajaxSend(data, "add")
+                .then((response) => {
+                    deleteSearchRes();
+                    if(response.status == 200){
+
+                    }
+                    
+                })
+                .catch((err) => console.error(err))
+        });
+
+        mainContent.appendChild(form);
+        
+    }
+
+
+    const ajaxSend = async (data, action) => {
         const fetchResp = await fetch('/', {
             method: 'POST',
             headers: {
-              'Action': 'search'
+            'content-type': 'application/json',
+              'Action': action
             },
-            body: formData
+            body: JSON.stringify(data)
         });
-        console.log(formData.get("text"))
         if (!fetchResp.ok) {
             throw new Error(`Ошибка по адресу ${url}, статус ошибки ${fetchResp.status}`);
         }
-        return await fetchResp.text();
+        return fetchResp;
     };
+
 
     var searchForm = document.getElementById("searchForm");
 
     searchForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        const formData = new FormData(searchForm);
-        //console.log(formData.get("text"))
 
-        ajaxSend(formData)
+        if (searchForm.text.value == ""){
+            return
+        }
+        var data = {text: searchForm.text.value};
+
+        ajaxSend(data,"search")
             .then((response) => {
-                //console.log(response);
+                deleteSearchRes();
+                if (response.status == 204){
+                    wordNotFound(searchForm.text.value);
+                }
+                else {
+                    wordFound(searchForm.text.value);
+                }
                 searchForm.reset(); // очищаем поля формы 
             })
             .catch((err) => console.error(err))
