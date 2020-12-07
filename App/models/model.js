@@ -43,14 +43,14 @@ var deleteNode = function (session, word) {
 }
 
 var deleteRelation = function (session, word1, word2, type) {
-  let query = `Match (n:Word) where n.id1 = $id match (b:Word) where b.id = $id2 match (n)-[k:${type}]-(b) delete n`
+  let query = `Match (n:Word) where n.id = $id1 match (b:Word) where b.id = $id2 match (n)-[k:${type}]-(b) delete k`
 
   let writeTxResultPromise = session.writeTransaction(txc => {
 
     var result = txc.run(query, 
       {
-        id1: uuidv5(word, MY_NAMESPACE),
-        id1: uuidv5(word, MY_NAMESPACE)
+        id1: uuidv5(word1, MY_NAMESPACE),
+        id2: uuidv5(word2, MY_NAMESPACE)
     })
     
     return result
