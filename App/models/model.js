@@ -24,7 +24,7 @@ var createNode = function (session, word) {
 
 
 var deleteNode = function (session, word) {
-  let query = 'Match (n:Word) where n.id = $id delete n'
+  let query = 'Match (n:Word) where n.id = $id detach delete n'
 
   let writeTxResultPromise = session.writeTransaction(txc => {
 
