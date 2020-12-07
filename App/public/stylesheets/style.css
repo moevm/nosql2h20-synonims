@@ -19,3 +19,8 @@
 .zero-border{
     border: 0;
 }
+
+.side-padding{
+    padding-right: 12px;
+    padding-left: 12px;
+}

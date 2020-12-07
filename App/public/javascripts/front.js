@@ -53,19 +53,91 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    const createRelForm = (text, option, id) => {
+
+        let item_form = document.createElement("form")
+        item_form.className = "form w-100";
+
+        let input_form_group = document.createElement("div");
+        input_form_group.className = "input-group"
+
+        let input_form = document.createElement("input");
+        input_form.type = "text";
+        input_form.name = "text";
+
+        let input_form_group_append = document.createElement("div");
+        input_form_group_append.className = "input-group-append";
+
+        let button_form_delete = document.createElement("button");
+        button_form_delete.type = "submit";
+
+
+        if (option == "add"){
+            input_form.className = "form-control zero-border";
+            input_form.placeholder = "Добавить новый"
+            input_form["aria-describedby"] = "button-addon" + id;
+            button_form_delete.className = "btn btn-outline-success zero-border";
+            button_form_delete.innerText = "+"
+            button_form_delete.id = "button-addon" + id;
+
+        }
+        else {
+            input_form.readOnly = true;
+            input_form.className = "zero-border form-control-plaintext side-padding";
+            input_form.value = text;
+            input_form["aria-describedby"] = "button-addon" + text + id;
+            button_form_delete.className = "btn btn-outline-danger zero-border";
+            button_form_delete.innerText = "-"
+            button_form_delete.id = "button-addon" + text + id;
+
+        }
+
+
+        input_form_group_append.appendChild(button_form_delete);
+
+        input_form_group.appendChild(input_form);
+        input_form_group.appendChild(input_form_group_append);
+
+        item_form.appendChild(input_form_group);
+
+
+        return item_form;
+    }
+
+
     const createList = (type, arr) => {
         let result = document.createElement("div");
         let label = document.createElement("h4")
         label.innerText = "type";
         let list = document.createElement("ul")
+        list.id = type
         list.className = "list-group";
         list.classList.add(type)
 
         arr.forEach((element, i) => {
-            item = document.createElement("li");
-            item.className = "list-group-item"
-            //item_form = document.createElement("form")
-            item.innerText = element;
+            let item = document.createElement("li");
+            item.className = "list-group-item zero-padding"
+
+            let item_form = createRelForm(element, "delete", type);
+
+            item_form.addEventListener('submit', function (e) {
+                e.preventDefault();
+        
+                let text = item_form.text.value;
+    
+                var data = {text1 : document.getElementById("foundWord").value ,text2: text, type: item_form.parentNode.parentNode.id.slice(0, -1)};
+        
+                ajaxSend(data,"deleteRelation")
+                .then((response) => {
+                    item_form.parentNode.parentNode.removeChild(item_form.parentNode)
+                })
+                .catch((err) => console.error(err))
+    
+            });
+
+
+            item.appendChild(item_form);
+
             list.appendChild(item);
         });
         
@@ -79,66 +151,50 @@ document.addEventListener('DOMContentLoaded', () => {
             label.innerText = "Словоформы";
         }    
 
-        let list_item = document.createElement("li");
-        list_item.className = "list-group-item zero-padding";
 
-        let form = document.createElement("form")
-        form.id = type;
-        form.className = "form w-100"
-
-        let input_group = document.createElement("div");
-        input_group.className = "input-group"
-
-        let input = document.createElement("input");
-        input.type = "text";
-        input.name = "text";
-        input.className = "form-control zero-border";
-        input.placeholder = "Добавить новый"
-        input["aria-describedby"] = "button-addon";
-
-        let input_group_append = document.createElement("div");
-        input_group_append.className = "input-group-append";
-
-        let button_new = document.createElement("button");
-        button_new.className = "btn btn-outline-success zero-border";
-        button_new.type = "submit";
-        button_new.innerText = "+"
-        button_new.id = "button-addon";
+        let item_add = document.createElement("li");
+        item_add.className = "list-group-item zero-padding"
 
 
-        input_group_append.appendChild(button_new);
+        let form_add = createRelForm("", "add", type);
 
-        input_group.appendChild(input);
-        input_group.appendChild(input_group_append);
-
-        form.appendChild(input_group);
-
-        form.addEventListener('submit', function (e) {
+        form_add.addEventListener('submit', function (e) {
             e.preventDefault();
-    
-            if (form.text.value == ""){
+
+            let text = form_add.text.value;
+
+            if (text == ""){
                 return
             }
 
-            //console.log(document.getElementById("foundWord").value)
-            var data = {text1 : document.getElementById("foundWord").value ,text2: form.text.value, type: form.id.slice(0, -1)};
+            let nodeList = form_add.parentNode.parentNode.childNodes;
+
+
+            for (let i = 0; i < nodeList.length -1; i++){
+                if (nodeList[i].firstChild.text.value == text){
+                    console.log("repeat")
+                    return
+                }
+            }
+
+            let type = form_add.parentNode.parentNode.id;
+
+            var data = {text1 : document.getElementById("foundWord").value ,text2: text, type: type.slice(0, -1)};
     
             ajaxSend(data,"addRelation")
-                .then((response) => {
+            .then((response) => {
+                let item = document.createElement("li");
+                item.className = "list-group-item zero-padding"
+                item.appendChild(createRelForm(text,"delete", type));
+                form_add.parentNode.parentNode.insertBefore(item, form_add.parentNode)
+            })
+            .catch((err) => console.error(err))
 
-                    item = document.createElement("li");
-                    item.className = "list-group-item"
-                    item.innerText = form.text.value;
-                    form.parentNode.parentNode.insertBefore(item,form.parentNode)
-                    form.reset();
-                })
-                .catch((err) => console.error(err))
         });
-        
 
-        list_item.appendChild(form);
+        item_add.appendChild(form_add)
 
-        list.appendChild(list_item);
+        list.appendChild(item_add);
         
         result.appendChild(label);
         result.appendChild(list)
