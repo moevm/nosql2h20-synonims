@@ -185,8 +185,25 @@ document.addEventListener('DOMContentLoaded', () => {
             .then((response) => {
                 let item = document.createElement("li");
                 item.className = "list-group-item zero-padding"
-                item.appendChild(createRelForm(text,"delete", type));
+                let item_form  = createRelForm(text,"delete", type)
+
+                item_form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+            
+                    let text = item_form.text.value;
+        
+                    var data = {text1 : document.getElementById("foundWord").value ,text2: text, type: item_form.parentNode.parentNode.id.slice(0, -1)};
+            
+                    ajaxSend(data,"deleteRelation")
+                    .then((response) => {
+                        item_form.parentNode.parentNode.removeChild(item_form.parentNode)
+                    })
+                    .catch((err) => console.error(err))
+        
+                });
+                item.appendChild(item_form);
                 form_add.parentNode.parentNode.insertBefore(item, form_add.parentNode)
+                form_add.reset();
             })
             .catch((err) => console.error(err))
 
