@@ -128,6 +128,56 @@ var createRelation = function (session,word1,word2, type) {
     return writeTxResultPromise;
 }
 
+var returnAllNodes = function(session){
+  let query = 'match (n:Word)  return n.text, size((n)-[:Synonym]-()) as sunonymNum, size((n)-[:Antonym]-()) as antonymNum, size((n)-[:Wordform]-()) as wordformNum'
+
+  let readTxResultPromise = session.readTransaction(txc => {
+
+    var result = txc.run(query)
+
+    return result
+  })
+
+  readTxResultPromise
+    .then(() => {session.close();})
+
+    return readTxResultPromise;
+}
+
+var returnAllNodesForParser = function(session){
+  let query = 'match (n:Word) return n.text'
+
+  let readTxResultPromise = session.readTransaction(txc => {
+
+    var result = txc.run(query)
+
+    return result
+  })
+
+  readTxResultPromise
+    .then(() => {session.close();})
+
+    return readTxResultPromise;
+}
+
+var returnRelationNum = function(session){
+  let query = 'MATCH ()-[]->() RETURN count(*)'
+
+  let readTxResultPromise = session.readTransaction(txc => {
+
+    var result = txc.run(query)
+
+    return result
+  })
+
+  readTxResultPromise
+    .then(() => {session.close();})
+
+    return readTxResultPromise;
+}
+
+
+
 
 module.exports = {
     createNode: createNode,
@@ -135,5 +185,8 @@ module.exports = {
     findNode: findNode,
     findRelation: findRelation,
     createRelation: createRelation,
-    deleteRelation: deleteRelation
+    deleteRelation: deleteRelation,
+    returnAllNodes: returnAllNodes,
+    returnRelationNum: returnRelationNum,
+    returnAllNodesForParser: returnAllNodesForParser
 }
