@@ -3,7 +3,6 @@ var router = express.Router();
 
 var model = require('../models/model')
 var dbUtils = require('../neo4j/dbUtils')
-var parser= require('../models/Parser/parser');
 
 
 

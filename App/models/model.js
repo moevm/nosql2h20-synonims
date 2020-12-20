@@ -121,12 +121,32 @@ var createRelation = function (session,word1,word2, type) {
     return result
   })
 
-
   writeTxResultPromise
     .then(() => {session.close()})
 
     return writeTxResultPromise;
 }
+
+
+var createRelationParser = function (session,word1,word2, type) {
+  let query = `match (n:Word) where n.id = $id1 match (b:Word) where b.id = $id2 merge (n)-[:${type}]-(b)`
+
+  let writeTxResultPromise = session.writeTransaction(txc => {
+
+    var result = txc.run(query, 
+      {
+        id1: uuidv5(word1, MY_NAMESPACE),
+        id2: uuidv5(word2, MY_NAMESPACE),
+      })
+
+    return result
+  })
+  writeTxResultPromise
+  .then(() => {session.close()})
+
+  return writeTxResultPromise;
+}
+
 
 var returnAllNodes = function(session){
   let query = 'match (n:Word)  return n.text, size((n)-[:Synonym]-()) as sunonymNum, size((n)-[:Antonym]-()) as antonymNum, size((n)-[:Wordform]-()) as wordformNum'
@@ -188,5 +208,6 @@ module.exports = {
     deleteRelation: deleteRelation,
     returnAllNodes: returnAllNodes,
     returnRelationNum: returnRelationNum,
-    returnAllNodesForParser: returnAllNodesForParser
+    returnAllNodesForParser: returnAllNodesForParser,
+    createRelationParser: createRelationParser
 }

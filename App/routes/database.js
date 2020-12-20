@@ -14,22 +14,18 @@ router.get('/',  function(req, res, next) {
     let nodes =  model.returnAllNodes(dbUtils.getSession());
 
     Promise.all([relationsNum, nodes]).then(values => { 
-
-        //console.log(values[0].records[0]._fields[0].toNumber());
         relNum = values[0].records[0]._fields[0].toNumber();
 
         let nodeNum = 0;
 
         let nodeArr = [];
 
-        console.log(values[1].records)
 
         values[1].records.forEach(element => {
             node = {text: element._fields[0], synonumNum: element._fields[1].toNumber(), antonymNum: element._fields[2].toNumber(), wordformNum: element._fields[3].toNumber()}
             nodeArr.push(node)
             nodeNum++;
         });;
-        //console.log(nodeArr);
 
         res.render('database',{nodeNum: nodeNum, relNum: relNum, nodeArr: nodeArr});
       })
@@ -44,9 +40,9 @@ router.get('/',  function(req, res, next) {
 router.get('/export',  function(req, res, next) {
 
   parser.convertBaseToObject(dbUtils)
-    .then((result) => {
-      console.log(result)
-      res.sendStatus(200)
+    .then((data) => {
+      //console.log(data)
+      res.send(data);
     })
     .catch(error => {
       console.log(error);
@@ -58,8 +54,15 @@ router.get('/export',  function(req, res, next) {
 
 router.post('/',  function(req, res, next) {  
   if (!req.body) return res.sendStatus(400)
-  console.log(req.body);
-  res.sendStatus(200);
+  //console.log(req.body);
+  parser.convertObjectToBase(dbUtils,req.body)
+  .then(()=>{
+    res.sendStatus(200);
+  })
+  .catch(error => {
+    console.log(error);
+    res.sendStatus(400);
+  });
 });
 
 

@@ -30,30 +30,18 @@ exports.readData = function (dbUtils) {
 
 */
 
-exports.convertBaseToObject = async function (dbUtils) {
+exports.convertBaseToObject = function (dbUtils) {
     const relArr = ["Synonyms", "Antonyms", "Wordforms"];
 
-    return await model.returnAllNodesForParser(dbUtils.getSession())
+    return model.returnAllNodesForParser(dbUtils.getSession())
         .then((result) => {
-            var data = [];
-            Promise.all(result.records.map(function(elem){
-                elem
-            }))
-            .then(values => {
-                console.log(values);
-              })
-              .catch(error => {
-                console.log(error);
-              });;
-            /*
-            result.records.forEach(element => {
-                let word = element._fields[0];
 
-                //console.log(word);
+            return Promise.all(result.records.map(function(elem){
+                var word = elem._fields[0];
                 let Synonyms = model.findRelation(dbUtils.getSession(),word, "Synonym");
                 let Antonyms = model.findRelation(dbUtils.getSession(),word, "Antonym");
                 let Wordforms = model.findRelation(dbUtils.getSession(),word, "Wordform");
-                Promise.all([Synonyms, Antonyms , Wordforms]).then(values => { 
+                return Promise.all([Synonyms, Antonyms , Wordforms]).then(values => { 
 
                     let RelObject = {};
           
@@ -67,17 +55,57 @@ exports.convertBaseToObject = async function (dbUtils) {
           
                     return RelObject
           
-                  }).then
-                  .catch(error => {
+                }).then(result => {
+                    result.text = word;
+                    return result             
+                })
+                .catch(error => {
                     console.log(error);
-                  });
-                
+                });
 
-            });
-            */
+            }))
+            .then(values => {
+                //console.log(values);
+                return values
+              })
+              .catch(error => {
+                console.log(error);
+              });;
+        }).then(values => {
+            //console.log(values)
+            return values;
         })
         .catch(error => {
             console.log(error);
         })
+
+}
+
+
+exports.convertObjectToBase = function(dbUtils, data) {
+
+
+    return Promise.all(data.map((element) => {
+        return model.createNode(dbUtils.getSession(),element.text);
+    })).then(()=>{
+        return Promise.all(data.map((elem) => {
+            let Synonyms = Promise.all(elem.Synonyms.map((syn)=>{
+                return model.createRelationParser(dbUtils.getSession(),elem.text,syn,"Synonym");
+            }));
+            let Antonyms = Promise.all(elem.Antonyms.map((ant)=>{
+                return model.createRelationParser(dbUtils.getSession(),elem.text,ant,"Antonym");
+            }))
+            let Wordforms = Promise.all(elem.Wordforms.map((wordform)=>{
+                return model.createRelationParser(dbUtils.getSession(),elem.text,wordform,"Wordform");
+            }))
+            return Promise.all([Synonyms,Antonyms,Wordforms]).catch(error => {
+                console.log(error);
+            });
+        })).catch(error => {
+            console.log(error);
+        });
+    }).catch(error => {
+        console.log(error);
+    });
 
 }
