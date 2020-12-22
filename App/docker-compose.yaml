@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+    nodejs:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+
+        depends_on:
+            -   neo4j
+    neo4j:
+        image: neo4j:4.1.3
+        environment:
+            NEO4J_AUTH: 'neo4j/1234'
+        ports:
+            - "7474:7474"
+            - "7687:7687"
+
