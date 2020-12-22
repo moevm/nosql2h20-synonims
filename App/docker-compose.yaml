@@ -6,9 +6,8 @@ services:
             dockerfile: Dockerfile
         ports:
             - "3000:3000"
-
-        depends_on:
-            -   neo4j
+        links:
+            - neo4j
     neo4j:
         image: neo4j:4.1.3
         environment:
