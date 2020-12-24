@@ -4,6 +4,10 @@ var router = express.Router();
 var model = require('../models/model')
 var dbUtils = require('../neo4j/dbUtils')
 
+var Az = require('az');
+var tokens = Az.Tokens('Мама мыла раму').done();
+console.log(tokens)
+
 
 router.get('/',  function(req, res, next) {
     res.render('analysis');
