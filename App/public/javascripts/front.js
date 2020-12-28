@@ -316,17 +316,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchForm.text.value == ""){
             return
         }
-        var data = {text: searchForm.text.value};
+        var word = searchForm.text.value.toLowerCase();
+        var data = {text: word};
 
         ajaxSend(data,"search")
             .then((response) => {
                 deleteSearchRes();
                 if (response.status == 204){
-                    wordNotFound(searchForm.text.value);
+                    wordNotFound(word);
                 }
                 else {
                     response.json().then((res)=>{
-                        wordFound(searchForm.text.value, res);
+                        wordFound(word, res);
                     })
                 }
                 //searchForm.reset(); // очищаем поля формы 

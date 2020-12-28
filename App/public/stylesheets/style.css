@@ -43,7 +43,9 @@
 
 
 
-
+th{
+    cursor: pointer;
+}
 
 
 th.sorted[data-order="1"],
