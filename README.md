@@ -10,19 +10,24 @@
 -------------------
 
 #### *Внешний вид стартовой страницы*
-![Стартовая страница](https://github.com/moevm/nosql2h20-synonims/blob/master/Screen/startScreen.jpg)
+![Стартовая страница](https://github.com/moevm/nosql2h20-synonims/blob/master/Screenshots/startScreen.jpg)
 
 + #### *Добавление нового слова*
-![Новое слово](https://github.com/moevm/nosql2h20-synonims/blob/master/Screen/addWord.jpg)
+![Новое слово](https://github.com/moevm/nosql2h20-synonims/blob/master/Screenshots/addWord.jpg)
 
 + #### *Удаление слова из базы*
-![Удаление слова](https://github.com/moevm/nosql2h20-synonims/blob/master/Screen/deleteWord.jpg)
+![Удаление слова](https://github.com/moevm/nosql2h20-synonims/blob/master/Screenshots/deleteWord.jpg)
 
 + #### *Редактирование связей* 
-![Добавление связей](https://github.com/moevm/nosql2h20-synonims/blob/master/Screen/addRel.jpg)
+![Добавление связей](https://github.com/moevm/nosql2h20-synonims/blob/master/Screenshots/addRel.jpg)
 
 #### *Внешний вид страницы базы данных*
-![База данных](https://github.com/moevm/nosql2h20-synonims/blob/master/Screen/database.jpg)
-#### *Позволяет*
+![База данных](https://github.com/moevm/nosql2h20-synonims/blob/master/Screenshots/database.jpg)
+#### *Функционал*
 - Импорт/экспорт данных в базу
 - Просморт содержимого базы данных
+
+#### *Внешний вид страницы анализа*
+![Анализ](https://github.com/moevm/nosql2h20-synonims/blob/master/Screenshots/analysis.jpg)
+#### *Функционал*
+Строит граф слов по исходному тексту
