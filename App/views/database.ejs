@@ -26,9 +26,8 @@
                 Please choose json file.
               </div>
             </div>
-
-
-            <table class="table mt-4">
+            <input id="regexp">
+            <table class="table mt-4 table_sort" id="table">
                 <thead class="thead-dark">
                   <tr>
                     <th scope="col">#</th>
@@ -38,7 +37,7 @@
                     <th scope="col" class="text-center">Словоформы</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="target">
                     <% nodeArr.forEach((node,i) => { %>
                         <tr>
                             <th scope="row"><%= i+1%></th>
