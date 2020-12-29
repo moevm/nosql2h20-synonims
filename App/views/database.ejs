@@ -44,7 +44,7 @@
                     <% nodeArr.forEach((node,i) => { %>
                         <tr>
                             <th scope="row"><%= i+1%></th>
-                            <td><%= node.text %></td>
+                            <td><a href="word/<%= node.text %>"><%= node.text %></a></td>
                             <td class="text-center"><%= node.synonumNum %></td>
                             <td class="text-center"><%= node.antonymNum %></td>
                             <td class="text-center"><%= node.wordformNum %></td>
